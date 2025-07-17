@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head><meta charset="utf-8"><title>Познай числото</title></head>
+<body>
+  <h2>Играч 2: Познай тайното число</h2>
+  <input type="text" id="guess" maxlength="4">
+  <button onclick="checkGuess()">Познай</button>
+  <p id="result"></p>
+  <ul id="history"></ul>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+  <script>
+   const firebaseConfig = {
+  apiKey: "AIzaSyAK4IKSCqoxBY9l3v2mSzE1sSWJ011IWcs",
+  authDomain: "mygame-6d4ae.firebaseapp.com",
+  databaseURL: "https://mygame-6d4ae-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "mygame-6d4ae",
+  storageBucket: "mygame-6d4ae.firebasestorage.app",
+  messagingSenderId: "940495945809",
+  appId: "1:940495945809:web:c56273d7a2468d6239f870"
+};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    let attempt = 0, secret = "";
+
+    db.ref("game/secret").on("value", snap => secret = snap.val() || "");
+
+    function checkGuess() {
+      const guess = document.getElementById("guess").value;
+      if (guess.length !== 4 || isNaN(guess)) {
+        alert("Въведи валидно 4-цифрено число");
+        return;
+      }
+      if (!secret) {
+        document.getElementById("result").innerText = "Играч 1 още не е въвел числото...";
+        return;
+      }
+      attempt++;
+      let correct = 0;
+      for (let i = 0; i < 4; i++) { if (guess[i] === secret[i]) correct++; }
+
+      const msg = guess === secret
+        ? 🎉 Поздравления! Позна числото за ${attempt} опита!
+        : Опит ${attempt}: ${guess} → Верни позиции: ${correct};
+
+      document.getElementById("result").innerText = msg;
+      const li = document.createElement("li"); li.textContent = msg;
+      document.getElementById("history").appendChild(li);
+    }
+  </script>
+</body>
+</html>
